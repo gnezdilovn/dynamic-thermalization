@@ -5,8 +5,13 @@ This code was used for the exact dynamics. The results are published in Communic
 Here is a brief description of the current repository:
 
 SYK2_thermalizer.py -- .py file that contains the necessary functions to compute the exact dynamics in the considered few-qubit system.
+
 ‎couplings_QC_N=4_nr=100_J=1.npy -- the data for 100 realizations of random coupling constants sampled from the complex Gaussian distribution (with zero mean and finite variance) used in the experimental run.
+
 ‎run_quench_protocol.ipynb -- Jupyter notebook that runs the evolution.
+
 ‎levels_stats.ipynb -- Jupyter notebook that analyzes the level statistics of the total Hamiltonian of the system, which equals the target Hamiltonian plus a randomized all-to-all auxiliary interaction.
+
 plotting.ipynb -- Jupyter notebook for plotting the data.
+
 ‎plotting_methods.ipynb -- Jupyter notebook for plotting some of the supplementary data.
