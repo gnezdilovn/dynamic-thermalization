@@ -209,8 +209,7 @@ def p(n, m, t, H_0, V):
     es = []
     ps = []
     #H_tot = H_0 + V
-    psi_t = ev_state(n, m, t, H_0, V)[1]
-    E_in = ev_state(n, m, t, H_0, V)[0]
+    E_in, psi_t = ev_state(n, m, t, H_0, V)
     for l in range(len(fs)):
         energ = np.conjugate(fs[l]) @ H_0 @ fs[l]
         if np.abs(np.imag(energ)) > 1e-15:
@@ -351,12 +350,11 @@ def SYK2(num, num_ex, Jc, nr, t_min, t_max, nt):
         Js = coupling_consts[j]
         V = H_SYK2(num, Js)
         for t in range(len(time)):
-            Le[t][j] = p(num, num_ex, time[t], H_qubits, V)[0] 
+            Le[t][j], Lp[t][j], ein = p(num, num_ex, time[t], H_qubits, V)
             delta = np.array(Le[t][j]) - np.array(energ)
             if delta.any() != 0:
                 print('error: the energies do not coincide')
             Le2[t][j] = [q ** 2 for i, q in enumerate(Le[t][j])]    
-            Lp[t][j] = p(num, num_ex, time[t], H_qubits, V)[1] 
             E[t][j] = np.array(Le[t][j]) @ np.array(Lp[t][j])
             E2[t][j] = np.array(Le2[t][j]) @ np.array(Lp[t][j]) 
             EE2[t][j] =  E2[t][j] - E[t][j] ** 2
@@ -403,56 +401,3 @@ def initial_energies(num):
         E_in[m] = np.real(p(num, m, 0., H_qubits, - H_qubits)[2])
         
     np.save('data/initial_N={}.npy'.format(num), E_in, allow_pickle = True)
-    
-def SYK2_long(num, num_ex, Jc, nr, t_min, t_max, nt): 
-    time = np.linspace(t_min, t_max, nt) 
-    #sp_levels = energ_sp(num, omega_min, omega_max)    #[0.28, 0.38, 0.63, 0.86] 
-    sp_levels = np.load('data/sp_levels_N={}.npy'.format(num), allow_pickle = True)  
-    H_qubits = H_0(num, sp_levels)
-    energ = np.load('data/energ_N={}.npy'.format(num), allow_pickle = True) #sorted(energ_mb(num, sp_levels)[1])
-    #print(np.round(sp_levels, 3))
-    #print(np.round(energ, 3))
-
-    Le = [[0] * nr for t in range(len(time))]
-    Le2 = [[0] * nr for t in range(len(time))]
-    Lp = [[0] * nr for t in range(len(time))] 
-    E = [[0] * nr for t in range(len(time))] 
-    E2 = [[0] * nr for t in range(len(time))] 
-    EE2 = [[0] * nr for t in range(len(time))]
-    S = [[0] * nr for t in range(len(time))]
-     
-    #coupling_consts = np.load('data/couplings_N={}_nr={}_J={}.npy'.format(num, nr, Jc), allow_pickle = True)
-    coupling_consts = np.load('data/couplings_QC_N={}_nr={}_J={}.npy'.format(num, nr, Jc), allow_pickle = True)
-    
-    E_in = np.real(p(num, num_ex, 0., H_qubits, - H_qubits)[2])
-    print(E_in)
-    
-    for j in range(nr):
-        print(j)
-        #Js = J_SYK2(num, Jc)
-        Js = coupling_consts[j]
-        V = H_SYK2(num, Js)
-        for t in range(len(time)):
-            Le[t][j] = p(num, num_ex, time[t], H_qubits, V)[0] 
-            delta = np.array(Le[t][j]) - np.array(energ)
-            if delta.any() != 0.:
-                print('error: the energies do not coincide')
-            Le2[t][j] = [q ** 2 for i, q in enumerate(Le[t][j])]    
-            Lp[t][j] = p(num, num_ex, time[t], H_qubits, V)[1] 
-            E[t][j] = np.array(Le[t][j]) @ np.array(Lp[t][j])
-            E2[t][j] = np.array(Le2[t][j]) @ np.array(Lp[t][j]) 
-            EE2[t][j] =  E2[t][j] - E[t][j] ** 2
-            S[t][j] = - np.array(Lp[t][j]) @ np.log(np.array(Lp[t][j]))
- 
-    pav = np.sum(np.array(Lp), 1) / nr
-    Eav = np.sum(np.array(E), 1)  / nr
-    E2av = np.sum(np.array(E2), 1)  / nr
-    VarE = E2av  - Eav ** 2
-    Sav = np.sum(np.array(S), 1) / nr
-
-    np.save('data/long/time.npy', time, allow_pickle = True)
-    np.save('data/long/es_N={}_M={}_nr={}.npy'.format(num, num_ex, nr), Le, allow_pickle = True)
-    np.save('data/long/p_N={}_M={}_nr={}.npy'.format(num, num_ex, nr), Lp, allow_pickle = True)
-    np.save('data/long/pav_N={}_M={}_nr={}.npy'.format(num, num_ex, nr), pav, allow_pickle = True)
-    np.save('data/long/E_N={}_M={}_nr={}.npy'.format(num, num_ex, nr), E, allow_pickle = True)
-    np.save('data/long/Eav_N={}_M={}_nr={}.npy'.format(num, num_ex, nr), Eav, allow_pickle = True)   
