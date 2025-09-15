@@ -307,7 +307,7 @@ def gen_energ(num, omega_min, omega_max):
     np.save('data/sp_levels_N={}.npy'.format(num), sp_levels, allow_pickle = True)  
     np.save('data/energ_N={}.npy'.format(num), energ, allow_pickle = True)
     
-def gen_energ4():
+def gen_energ4(num):
     sp_levels = [0.28, 0.38, 0.63, 0.86]
     #sp_levels = [0.86, 0.63, 0.38, 0.28]
     #sp_levels = [0.28, 0.63, 0.38, 0.86]
